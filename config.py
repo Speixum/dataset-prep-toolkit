@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-"""路径配置 —— 换成你自己机器上的路径即可。
-
-三个路径的含义：
-  LABELME_DIR  Labelme 导出的多边形标注（每张图一个 .json）
-  DATA587_DIR  已转换好的训练/测试数据（Train/Test 下各有 JPEGImages 与 BlackWhite）
-"""
+"""路径配置：数据根目录优先读环境变量，未设置时取仓库旁的 dataset/ 目录。"""
 import os
 
-# 数据根目录（按需修改）
-DATASET_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+# 原始数据根目录（不含数据本身，脚本只读不写）
+# 取值顺序：
+#   1) 环境变量 BLADE_DATASET_ROOT
+#   2) 仓库目录下的 dataset/（把 AEBIS 数据放在这里即可）
+_REPO_DIR = os.path.dirname(os.path.abspath(__file__))
+DATASET_ROOT = os.environ.get("BLADE_DATASET_ROOT") or os.path.join(_REPO_DIR, "dataset")
 
-# Labelme 多边形标注目录
-LABELME_DIR = os.path.join(DATASET_ROOT, "labelme_json")
+# Labelme 多边形标注（每张图一个 json）
+LABELME_DIR = os.path.join(DATASET_ROOT, "Dataset", "航空发动机叶片数据集")
 
-# 已转换好的数据集目录（Train / Test）
+# 已经转换好的 587 张训练数据（Train 528 / Test 59）
 DATA587_DIR = os.path.join(DATASET_ROOT, "data_587")
 
-# 类别合并规则：原始多类 -> 统一成 1 类
-# 依据：小类样本量过低（最小类仅 21 个多边形），单独成类学不动且拉低整体指标
-MERGED_CLASS_NAME = "defect"
+# 类别合并规则：原始 7 类缺陷 -> 统一成 1 类缺陷
+# 合并依据：Crack(33) / Nick(21) / Tip curl(30) 样本量过低，单独成类学不动且拉低整体指标
+KEEP_CLASSES = None          # None = 全部保留原类别
+MERGED_CLASS_NAME = "defect" # 合并后的类名
